@@ -17,6 +17,7 @@ Future<void> _setup() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _setup();
+  await locator.get<EMTService>().login();
   runApp(const OpenEMT());
 }
 
