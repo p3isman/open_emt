@@ -11,17 +11,16 @@ class StopInfoBloc extends Bloc<StopInfoBlocEvent, StopInfoState> {
   final EMTRepository emtRepository;
 
   StopInfoBloc({required this.emtRepository}) : super(const StopInfoEmpty()) {
-    on<StopInfoBlocEvent>((event, emit) {
-      if (event is GetStopInfo) {
-        _mapGetStopInfoToState(event, emit);
-      }
-    });
+    on<GetStopInfo>(_onGetStopInfo);
   }
 
-  void _mapGetStopInfoToState(
+  Future<void> _onGetStopInfo(
       GetStopInfo event, Emitter<StopInfoState> emit) async {
     emit(const StopInfoLoading());
     final stopInfo = await emtRepository.getStopInfo(event.stopId);
-    emit(StopInfoLoaded(stopInfo: stopInfo));
+    if (stopInfo.code == '00') {
+      return emit(StopInfoLoaded(stopInfo: stopInfo));
+    }
+    emit(const StopInfoError());
   }
 }
