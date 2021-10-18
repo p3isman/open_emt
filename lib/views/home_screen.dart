@@ -15,32 +15,29 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: CustomScrollView(
-      slivers: [
-        const SliverAppBar(
-          title: Text('OpenEMT'),
-        ),
-        SliverList(
-          delegate: SliverChildListDelegate([
-            TextField(
-              keyboardType: TextInputType.number,
-              onSubmitted: (value) =>
-                  context.read<StopInfoBloc>().add(GetStopInfo(stopId: value)),
-            ),
-            BlocBuilder<StopInfoBloc, StopInfoState>(
-              builder: (context, state) {
-                if (state is StopInfoLoaded) {
-                  return Text(state.stopInfo.toString());
-                } else if (state is StopInfoLoading) {
-                  return const CircularProgressIndicator();
-                } else {
-                  return const SizedBox.shrink();
-                }
-              },
-            ),
-          ]),
-        ),
-      ],
-    ));
+      appBar: AppBar(title: const Text('OpenEMT')),
+      body: ListView(
+        children: [
+          TextField(
+            keyboardType: TextInputType.number,
+            onSubmitted: (value) =>
+                context.read<StopInfoBloc>().add(GetStopInfo(stopId: value)),
+          ),
+          BlocBuilder<StopInfoBloc, StopInfoState>(
+            builder: (context, state) {
+              if (state is StopInfoLoaded) {
+                return Text(state.stopInfo.toString());
+              } else if (state is StopInfoLoading) {
+                return const CircularProgressIndicator();
+              } else if (state is StopInfoError) {
+                return const Text('Algo ha ido mal.');
+              } else {
+                return const SizedBox.shrink();
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
