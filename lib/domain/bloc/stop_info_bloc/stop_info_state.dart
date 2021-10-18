@@ -27,3 +27,10 @@ class StopInfoLoaded extends StopInfoState {
   @override
   List<Object?> get props => [stopInfo];
 }
+
+class StopInfoError extends StopInfoState {
+  const StopInfoError();
+
+  @override
+  List<Object?> get props => [];
+}
