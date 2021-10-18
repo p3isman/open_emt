@@ -109,13 +109,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "7.2.0"
-  http:
-    dependency: "direct main"
-    description:
-      name: http
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.13.4"
   http_parser:
     dependency: transitive
     description:
@@ -227,5 +220,5 @@ packages:
     source: hosted
     version: "2.1.0"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
+  dart: ">=2.12.0 <3.0.0"
   flutter: ">=1.16.0"
