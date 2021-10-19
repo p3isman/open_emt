@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:open_emt/data/services/emt_service.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
 import 'package:open_emt/domain/repositories/emt_repository.dart';
+import 'package:open_emt/views/detail_screen.dart';
 import 'package:open_emt/views/home_screen.dart';
 
 final GetIt locator = GetIt.instance;
@@ -17,7 +18,6 @@ Future<void> _setup() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _setup();
-  await locator.get<EMTService>().login();
   runApp(const OpenEMT());
 }
 
@@ -37,7 +37,8 @@ class OpenEMT extends StatelessWidget {
         title: 'OpenEMT',
         initialRoute: HomeScreen.route,
         routes: {
-          HomeScreen.route: (context) => const HomeScreen(),
+          HomeScreen.route: (context) => HomeScreen(),
+          DetailScreen.route: (context) => const DetailScreen(),
         },
       ),
     );
