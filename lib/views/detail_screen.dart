@@ -26,8 +26,10 @@ class DetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: DetailTitle(stopInfo: stopInfo),
+        centerTitle: true,
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           BlocBuilder<StopInfoBloc, StopInfoState>(
             builder: (context, state) {
@@ -54,7 +56,7 @@ class DetailScreen extends StatelessWidget {
                   padding: EdgeInsets.all(8.0),
                   child: Text(
                     'No es posible obtener información.',
-                    style: AppTheme.waitingTime,
+                    style: AppTheme.errorMessage,
                   ),
                 );
               } else {
