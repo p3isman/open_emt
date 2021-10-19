@@ -6,7 +6,7 @@ class StopModel {
     required this.data,
   });
   late final String code;
-  late final String description;
+  late final dynamic description;
   late final String datetime;
   late final List<Data> data;
 
@@ -34,13 +34,13 @@ class Data {
     required this.extraInfo,
     required this.incident,
   });
-  late final List<dynamic> arrive;
+  late final List<Arrive> arrive;
   late final List<StopInfo> stopInfo;
   late final List<dynamic> extraInfo;
   late final Incident incident;
 
   Data.fromJson(Map<String, dynamic> json) {
-    arrive = List.castFrom<dynamic, dynamic>(json['Arrive']);
+    arrive = List.from(json['Arrive']).map((e) => Arrive.fromJson(e)).toList();
     stopInfo =
         List.from(json['StopInfo']).map((e) => StopInfo.fromJson(e)).toList();
     extraInfo = List.castFrom<dynamic, dynamic>(json['ExtraInfo']);
@@ -53,6 +53,59 @@ class Data {
     _data['StopInfo'] = stopInfo.map((e) => e.toJson()).toList();
     _data['ExtraInfo'] = extraInfo;
     _data['Incident'] = incident.toJson();
+    return _data;
+  }
+}
+
+class Arrive {
+  Arrive({
+    required this.line,
+    required this.stop,
+    required this.isHead,
+    required this.destination,
+    required this.deviation,
+    required this.bus,
+    required this.geometry,
+    required this.estimateArrive,
+    required this.distanceBus,
+    required this.positionTypeBus,
+  });
+  late final String line;
+  late final String stop;
+  late final String isHead;
+  late final String destination;
+  late final int deviation;
+  late final int bus;
+  late final Geometry geometry;
+  late final int estimateArrive;
+  late final int distanceBus;
+  late final String positionTypeBus;
+
+  Arrive.fromJson(Map<String, dynamic> json) {
+    line = json['line'];
+    stop = json['stop'];
+    isHead = json['isHead'];
+    destination = json['destination'];
+    deviation = json['deviation'];
+    bus = json['bus'];
+    geometry = Geometry.fromJson(json['geometry']);
+    estimateArrive = json['estimateArrive'];
+    distanceBus = json['DistanceBus'];
+    positionTypeBus = json['positionTypeBus'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+    _data['line'] = line;
+    _data['stop'] = stop;
+    _data['isHead'] = isHead;
+    _data['destination'] = destination;
+    _data['deviation'] = deviation;
+    _data['bus'] = bus;
+    _data['geometry'] = geometry.toJson();
+    _data['estimateArrive'] = estimateArrive;
+    _data['DistanceBus'] = distanceBus;
+    _data['positionTypeBus'] = positionTypeBus;
     return _data;
   }
 }
