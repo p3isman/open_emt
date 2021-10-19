@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:open_emt/data/models/screen_arguments.dart';
 import 'package:open_emt/data/models/stop_model.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
+import 'package:open_emt/domain/repositories/emt_repository.dart';
+import 'package:open_emt/main.dart';
 import 'package:open_emt/views/theme/theme.dart';
 import 'package:open_emt/views/widgets/arrive_info.dart';
 import 'package:open_emt/views/widgets/detail_title.dart';
@@ -23,6 +25,8 @@ class DetailScreen extends StatelessWidget {
         (ModalRoute.of(context)!.settings.arguments as ScreenArguments)
             .stopInfo;
 
+    final _emtRepository = locator.get<EMTRepository>();
+
     return Scaffold(
       appBar: AppBar(
         title: DetailTitle(stopInfo: stopInfo),
@@ -36,10 +40,13 @@ class DetailScreen extends StatelessWidget {
               if (state is StopInfoLoaded) {
                 return Expanded(
                   child: ListView.builder(
-                      itemCount: state.stopInfo.data.first.arrive.length,
+                      itemCount: _emtRepository
+                          .groupArrivesByLine(state.stopInfo.data.first.arrive)
+                          .length,
                       itemBuilder: (context, i) {
                         return ArriveInfoWidget(
-                            arriveInfo: state.stopInfo.data.first.arrive[i]);
+                            arriveInfo: _emtRepository.groupArrivesByLine(
+                                state.stopInfo.data.first.arrive)[i]);
                       }),
                 );
               } else if (state is StopInfoLoading) {

@@ -4,7 +4,7 @@ import 'package:open_emt/views/theme/theme.dart';
 import 'package:open_emt/utils/string_extension.dart';
 
 class ArriveInfoWidget extends StatelessWidget {
-  final Arrive arriveInfo;
+  final List<Arrive> arriveInfo;
 
   const ArriveInfoWidget({required this.arriveInfo, Key? key})
       : super(key: key);
@@ -28,35 +28,62 @@ class ArriveInfoWidget extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  arriveInfo.line,
+                  arriveInfo[0].line,
                   style: AppTheme.lineNumber,
                 ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: Row(
-                  children: arriveInfo.estimateArrive < 30
-                      ? [
-                          const Text(
-                            '<<<',
-                            style: AppTheme.waitingTime,
-                          )
-                        ]
-                      : [
-                          Text(
-                            '${(arriveInfo.estimateArrive / 60).round()}min',
-                            style: AppTheme.waitingTime,
-                          ),
-                          const Text(
-                            ' | ',
-                            style: AppTheme.waitingTime,
-                          ),
-                          Text(
-                            '${arriveInfo.distanceBus}m',
-                            style: AppTheme.waitingTime,
-                          ),
-                        ]),
+              child: Column(
+                children: [
+                  Row(
+                      children: arriveInfo[0].estimateArrive < 30
+                          ? [
+                              const Text(
+                                '<<<',
+                                style: AppTheme.waitingTime,
+                              )
+                            ]
+                          : [
+                              Text(
+                                '${(arriveInfo[0].estimateArrive / 60).round()}min',
+                                style: AppTheme.waitingTime,
+                              ),
+                              const Text(
+                                ' | ',
+                                style: AppTheme.waitingTime,
+                              ),
+                              Text(
+                                '${arriveInfo[0].distanceBus}m',
+                                style: AppTheme.waitingTime,
+                              ),
+                            ]),
+                  const SizedBox(height: 5.0),
+                  Row(
+                      children: arriveInfo[1].estimateArrive < 30
+                          ? [
+                              const Text(
+                                '<<<',
+                                style: AppTheme.waitingTime,
+                              )
+                            ]
+                          : [
+                              Text(
+                                '${(arriveInfo[1].estimateArrive / 60).round()}min',
+                                style: AppTheme.waitingTime,
+                              ),
+                              const Text(
+                                ' | ',
+                                style: AppTheme.waitingTime,
+                              ),
+                              Text(
+                                '${arriveInfo[1].distanceBus}m',
+                                style: AppTheme.waitingTime,
+                              ),
+                            ]),
+                ],
+              ),
             ),
           ],
         ),
@@ -65,7 +92,7 @@ class ArriveInfoWidget extends StatelessWidget {
           child: Row(
             children: [
               Text(
-                arriveInfo.destination.toLowerCase().toTitleCase(),
+                arriveInfo.first.destination.toLowerCase().toTitleCase(),
                 style: AppTheme.waitingTime,
               ),
             ],

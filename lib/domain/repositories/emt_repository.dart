@@ -48,4 +48,20 @@ class EMTRepository {
       rethrow;
     }
   }
+
+  List<List<Arrive>> groupArrivesByLine(List<Arrive> arrives) {
+    arrives.sort((a, b) => a.line.compareTo(b.line));
+
+    List<List<Arrive>> orderedArrives = [];
+
+    for (int i = 0; i < arrives.length / 2;) {
+      List<Arrive> lineArrives = [];
+      lineArrives.add(arrives[i++]);
+      lineArrives.add(arrives[i++]);
+      lineArrives.sort((a, b) => a.estimateArrive.compareTo(b.estimateArrive));
+      orderedArrives.add(lineArrives);
+    }
+
+    return orderedArrives;
+  }
 }
