@@ -29,8 +29,10 @@ class StopInfoLoaded extends StopInfoState {
 }
 
 class StopInfoError extends StopInfoState {
-  const StopInfoError();
+  final DioError? error;
+
+  const StopInfoError({this.error});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [error];
 }

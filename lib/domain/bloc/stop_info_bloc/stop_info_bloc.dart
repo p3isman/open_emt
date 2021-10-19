@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
+import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:open_emt/data/models/stop_model.dart';
@@ -17,10 +20,23 @@ class StopInfoBloc extends Bloc<StopInfoBlocEvent, StopInfoState> {
   Future<void> _onGetStopInfo(
       GetStopInfo event, Emitter<StopInfoState> emit) async {
     emit(const StopInfoLoading());
-    final stopInfo = await emtRepository.getStopInfo(event.stopId);
-    if (stopInfo.code == '00') {
+
+    StopModel? stopInfo;
+
+    try {
+      stopInfo = await emtRepository.getStopInfo(event.stopId);
+    } on DioError catch (e) {
+      return emit(StopInfoError(error: e));
+    }
+
+    if (stopInfo?.description is List) {
+      return emit(const StopInfoError());
+    }
+
+    if (stopInfo is StopModel && stopInfo.code == '00') {
       return emit(StopInfoLoaded(stopInfo: stopInfo));
     }
+
     emit(const StopInfoError());
   }
 }
