@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:open_emt/data/models/screen_arguments.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
-import 'package:open_emt/views/detail_screen.dart';
+import 'package:open_emt/views/screens/detail_screen.dart';
 import 'package:open_emt/views/theme/theme.dart';
 
 class HomeScreen extends StatelessWidget {

@@ -4,8 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:open_emt/data/services/emt_service.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
 import 'package:open_emt/domain/repositories/emt_repository.dart';
-import 'package:open_emt/views/detail_screen.dart';
-import 'package:open_emt/views/home_screen.dart';
+import 'package:open_emt/views/screens/detail_screen.dart';
+import 'package:open_emt/views/screens/home_screen.dart';
 
 final GetIt locator = GetIt.instance;
 
