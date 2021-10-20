@@ -37,7 +37,7 @@ class OpenEMT extends StatelessWidget {
         title: 'OpenEMT',
         initialRoute: HomeScreen.route,
         routes: {
-          HomeScreen.route: (context) => HomeScreen(),
+          HomeScreen.route: (context) => const HomeScreen(),
           DetailScreen.route: (context) => const DetailScreen(),
         },
       ),
