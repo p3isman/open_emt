@@ -44,9 +44,15 @@ class DetailScreen extends StatelessWidget {
                           .groupArrivesByLine(state.stopInfo.data.first.arrive)
                           .length,
                       itemBuilder: (context, i) {
-                        return ArriveInfoWidget(
-                            arriveInfo: _emtRepository.groupArrivesByLine(
-                                state.stopInfo.data.first.arrive)[i]);
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5.0,
+                            vertical: 3.0,
+                          ),
+                          child: ArriveInfoWidget(
+                              arriveInfo: _emtRepository.groupArrivesByLine(
+                                  state.stopInfo.data.first.arrive)[i]),
+                        );
                       }),
                 );
               } else if (state is StopInfoLoading) {
