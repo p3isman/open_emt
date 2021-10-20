@@ -4,19 +4,27 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:open_emt/data/models/screen_arguments.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
+import 'package:open_emt/utils/utils.dart';
 import 'package:open_emt/views/screens/detail_screen.dart';
 import 'package:open_emt/views/theme/theme.dart';
 
-class HomeScreen extends StatelessWidget {
-  final TextEditingController _textEditingController = TextEditingController();
-
-  HomeScreen({Key? key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
   /// Static named route for page
   static const String route = '/home';
 
   /// Static method to return the widget as a PageRoute
-  static Route go() => MaterialPageRoute<void>(builder: (_) => HomeScreen());
+  static Route go() =>
+      MaterialPageRoute<void>(builder: (_) => const HomeScreen());
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final _formFieldKey = GlobalKey<FormFieldState>();
+  final TextEditingController _textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -42,16 +50,31 @@ class HomeScreen extends StatelessWidget {
                   left: 10.0,
                   right: 10.0,
                 ),
-                child: TextField(
+                child: TextFormField(
+                  key: _formFieldKey,
                   controller: _textEditingController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                       labelText: 'Número de parada',
-                      hintText: 'Introduce un número de parada.',
                       border: OutlineInputBorder(),
                       icon: FaIcon(FontAwesomeIcons.bus)),
-                  onSubmitted: (text) {
-                    context.read<StopInfoBloc>().add(GetStopInfo(stopId: text));
+                  validator: (text) {
+                    if (text!.isEmpty) {
+                      return 'Introduce un número de parada.';
+                    }
+                    text = text.trim();
+                    if (text == '' ||
+                        !isNumeric(text) ||
+                        int.parse(text) <= 0) {
+                      return 'Parada no válida.';
+                    }
+                  },
+                  onFieldSubmitted: (text) {
+                    if (_formFieldKey.currentState!.validate()) {
+                      context
+                          .read<StopInfoBloc>()
+                          .add(GetStopInfo(stopId: text));
+                    }
                   },
                 ),
               ),
