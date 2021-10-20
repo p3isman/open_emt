@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:open_emt/data/models/stop_model.dart';
 import 'package:open_emt/data/services/emt_service.dart';
-import 'package:open_emt/utils/utils.dart';
 
 class EMTRepository {
   final EMTService emtService;
@@ -28,11 +27,9 @@ class EMTRepository {
       rethrow;
     }
 
+// Check if stop number is valid
     stopId = stopId.trim();
-    if (stopId != '' &&
-        isNumeric(stopId) &&
-        int.parse(stopId) > 0 &&
-        int.parse(stopId) <= numberOfStops) {
+    if (int.parse(stopId) <= numberOfStops) {
       try {
         return await emtService.getStopInfo(stopId);
       } on DioError {
@@ -54,13 +51,16 @@ class EMTRepository {
 
     List<List<Arrive>> orderedArrives = [];
 
-    for (int i = 0; i < arrives.length / 2;) {
+    for (int i = 0; i < arrives.length;) {
       List<Arrive> lineArrives = [];
       lineArrives.add(arrives[i++]);
       lineArrives.add(arrives[i++]);
       lineArrives.sort((a, b) => a.estimateArrive.compareTo(b.estimateArrive));
       orderedArrives.add(lineArrives);
     }
+
+    orderedArrives.sort(
+        (a, b) => a.first.estimateArrive.compareTo(b.first.estimateArrive));
 
     return orderedArrives;
   }
