@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:open_emt/data/models/screen_arguments.dart';
+import 'package:open_emt/domain/bloc/favorite_stops_bloc/favorite_stops_bloc.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
 import 'package:open_emt/utils/utils.dart';
 import 'package:open_emt/views/screens/detail_screen.dart';
@@ -42,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
         builder: (context, state) {
-          return Column(
+          return ListView(
             children: [
               Padding(
                 padding: const EdgeInsets.only(
@@ -64,6 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                     text = text.trim();
                     if (text == '' ||
+                        text.contains('.') ||
                         !isNumeric(text) ||
                         int.parse(text) <= 0) {
                       return 'Parada no válida.';
@@ -81,7 +83,9 @@ class _HomeScreenState extends State<HomeScreen> {
               if (state is StopInfoLoading)
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 40.0),
-                  child: CircularProgressIndicator(),
+                  child: SizedBox(
+                      height: 100.0,
+                      child: Center(child: CircularProgressIndicator())),
                 ),
               if (state is StopInfoError)
                 Padding(
@@ -101,9 +105,122 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
+              BlocBuilder<FavoriteStopsBloc, FavoriteStopsState>(
+                  builder: (context, state) {
+                if (state is FavoritesLoadSuccess) {
+                  return Column(
+                    children: List.generate(
+                      state.stops.length,
+                      (index) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: FavoriteStop(state, index),
+                      ),
+                    ),
+                  );
+                } else {
+                  return const SizedBox.shrink();
+                }
+              })
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class FavoriteStop extends StatelessWidget {
+  final FavoritesLoadSuccess state;
+  final int index;
+
+  const FavoriteStop(
+    this.state,
+    this.index, {
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dismissible(
+      onDismissed: (direction) => BlocProvider.of<FavoriteStopsBloc>(context)
+          .add(FavoriteDeleted(state.stops[index])),
+      background: Container(
+        color: Colors.red,
+        child: const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 25.0),
+            child: Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+      secondaryBackground: Container(
+        color: Colors.red,
+        child: const Align(
+          alignment: Alignment.centerRight,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 25.0),
+            child: Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+      key: UniqueKey(),
+      child: ListTile(
+        onTap: () => context
+            .read<StopInfoBloc>()
+            .add(GetStopInfo(stopId: state.stops[index].label)),
+        leading: Card(
+          color: Colors.grey.shade300,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(state.stops[index].label,
+                style: AppTheme.waitingTime.copyWith(fontSize: 16.0)),
+          ),
+        ),
+        title: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            state.stops[index].direction,
+            style: AppTheme.waitingTime.copyWith(fontSize: 14.0),
+            softWrap: true,
+          ),
+        ),
+        subtitle: Wrap(
+          children: List.generate(
+            state.stops[index].stopLines.data.length,
+            (stopLine) => Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              elevation: 4.0,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  gradient: LinearGradient(
+                    colors:
+                        state.stops[index].stopLines.data[stopLine].line == 'N'
+                            ? [Colors.black, Colors.grey.shade700]
+                            : [Colors.blue.shade700, Colors.blue.shade400],
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8.0, vertical: 5.0),
+                  child: Text(
+                    state.stops[index].stopLines.data[stopLine].line,
+                    style: AppTheme.lineNumber.copyWith(fontSize: 14.0),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
