@@ -33,9 +33,6 @@ class ArriveInfoWidget extends StatelessWidget {
                       bottom: 10.0,
                     ),
                     elevation: 4.0,
-                    // color: arriveInfo.first.line[0] == 'N'
-                    //     ? Colors.black
-                    //     : Colors.blue,
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
