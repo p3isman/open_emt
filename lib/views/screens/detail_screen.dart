@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:open_emt/data/models/screen_arguments.dart';
 import 'package:open_emt/data/models/stop_model.dart';
+import 'package:open_emt/domain/bloc/favorite_stops_bloc/favorite_stops_bloc.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
 import 'package:open_emt/domain/repositories/emt_repository.dart';
 import 'package:open_emt/main.dart';
@@ -83,13 +84,40 @@ class DetailScreen extends StatelessWidget {
       floatingActionButton:
           BlocBuilder<StopInfoBloc, StopInfoState>(builder: (context, state) {
         return (state is StopInfoLoaded)
-            ? Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: FloatingActionButton(
-                  onPressed: () => context.read<StopInfoBloc>().add(GetStopInfo(
-                      stopId: state.stopInfo.data.first.stopInfo.first.label)),
-                  child: const Icon(Icons.refresh),
-                ),
+            ? Wrap(
+                direction: Axis.vertical,
+                children: [
+                  BlocBuilder<FavoriteStopsBloc, FavoriteStopsState>(
+                      builder: (context, favoriteStopsState) {
+                    if (favoriteStopsState is FavoritesLoadSuccess) {
+                      return FloatingActionButton(
+                        heroTag: null,
+                        onPressed: favoriteStopsState.stops.contains(stopInfo)
+                            ? () => context
+                                .read<FavoriteStopsBloc>()
+                                .add(FavoriteDeleted(stopInfo))
+                            : () => context
+                                .read<FavoriteStopsBloc>()
+                                .add(FavoriteAdded(stopInfo)),
+                        child: favoriteStopsState.stops.contains(stopInfo)
+                            ? const Icon(Icons.favorite)
+                            : const Icon(Icons.favorite_border),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15.0),
+                    child: FloatingActionButton(
+                      heroTag: null,
+                      onPressed: () => context.read<StopInfoBloc>().add(
+                          GetStopInfo(
+                              stopId: state
+                                  .stopInfo.data.first.stopInfo.first.label)),
+                      child: const Icon(Icons.refresh),
+                    ),
+                  ),
+                ],
               )
             : const SizedBox.shrink();
       }),
