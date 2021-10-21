@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:open_emt/data/services/db_service.dart';
 import 'package:open_emt/data/services/emt_service.dart';
+import 'package:open_emt/domain/bloc/favorite_stops_bloc/favorite_stops_bloc.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
 import 'package:open_emt/domain/repositories/emt_repository.dart';
+import 'package:open_emt/domain/repositories/favorites_repository.dart';
 import 'package:open_emt/views/screens/detail_screen.dart';
 import 'package:open_emt/views/screens/home_screen.dart';
 
 final GetIt locator = GetIt.instance;
 
 Future<void> _setup() async {
+  locator.registerLazySingleton<DBService>(() => DBService());
   locator.registerLazySingleton<EMTService>(() => EMTService());
+  locator.registerLazySingleton<FavoritesRepository>(
+      () => FavoritesRepository(dbService: locator.get<DBService>()));
   locator.registerLazySingleton<EMTRepository>(
       () => EMTRepository(emtService: locator.get<EMTService>()));
 }
@@ -28,6 +34,11 @@ class OpenEMT extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) => FavoriteStopsBloc(
+              favoritesRepository: locator.get<FavoritesRepository>())
+            ..add(const FavoritesInitialize()),
+        ),
         BlocProvider(
           create: (context) =>
               StopInfoBloc(emtRepository: locator.get<EMTRepository>()),
