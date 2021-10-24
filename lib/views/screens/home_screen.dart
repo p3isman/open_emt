@@ -24,32 +24,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _formFieldKey = GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> _formFieldKey = GlobalKey<FormFieldState>();
   final TextEditingController _textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('OpenEMT')),
-      body: BlocConsumer<StopInfoBloc, StopInfoState>(
-        listenWhen: (previous, current) => current is StopInfoLoaded,
-        listener: (context, state) {
-          if (state is StopInfoLoaded && ModalRoute.of(context)!.isCurrent) {
-            Navigator.of(context).pushNamed(
-              DetailScreen.route,
-              arguments: ScreenArguments(
-                  stopInfo: state.stopInfo.data.first.stopInfo.first),
-            );
-          }
-        },
+      body: BlocBuilder<StopInfoBloc, StopInfoState>(
         builder: (context, state) {
           return ListView(
             children: [
               Padding(
-                padding: const EdgeInsets.only(
-                  top: 20.0,
-                  left: 10.0,
-                  right: 10.0,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 20.0,
+                  horizontal: 10.0,
                 ),
                 child: TextFormField(
                   key: _formFieldKey,
@@ -57,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                       labelText: 'Número de parada',
+                      hintText: 'Introduce un código de parada.',
                       border: OutlineInputBorder(),
                       icon: FaIcon(FontAwesomeIcons.bus)),
                   validator: (text) {
@@ -76,44 +66,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       context
                           .read<StopInfoBloc>()
                           .add(GetStopInfo(stopId: text));
+                      Navigator.pushNamed(context, DetailScreen.route,
+                          arguments: ScreenArguments(stopId: text));
                     }
                   },
                 ),
               ),
-              if (state is StopInfoLoading)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40.0),
-                  child: SizedBox(
-                      height: 100.0,
-                      child: Center(child: CircularProgressIndicator())),
-                ),
-              if (state is StopInfoError)
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 40.0,
-                    horizontal: 15.0,
-                  ),
-                  child: Card(
-                    color: Colors.red.shade200,
-                    child: const Padding(
-                      padding: EdgeInsets.all(15.0),
-                      child: Text(
-                        'Error al obtener información sobre la parada.',
-                        style: AppTheme.errorMessage,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ),
               BlocBuilder<FavoriteStopsBloc, FavoriteStopsState>(
                   builder: (context, state) {
                 if (state is FavoritesLoadSuccess) {
                   return Column(
                     children: List.generate(
                       state.stops.length,
-                      (index) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: FavoriteStop(state, index),
+                      (index) => Column(
+                        children: [
+                          if (index != 0) const Divider(),
+                          FavoriteStop(state, index),
+                        ],
                       ),
                     ),
                   );
@@ -172,15 +141,20 @@ class FavoriteStop extends StatelessWidget {
       ),
       key: UniqueKey(),
       child: ListTile(
-        onTap: () => context
-            .read<StopInfoBloc>()
-            .add(GetStopInfo(stopId: state.stops[index].label)),
+        onTap: () {
+          context
+              .read<StopInfoBloc>()
+              .add(GetStopInfo(stopId: state.stops[index].label));
+          Navigator.pushNamed(context, DetailScreen.route,
+              arguments: ScreenArguments(stopId: state.stops[index].label));
+        },
         leading: Card(
-          color: Colors.grey.shade300,
+          color: Colors.grey.shade700,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(state.stops[index].label,
-                style: AppTheme.waitingTime.copyWith(fontSize: 16.0)),
+                style: AppTheme.waitingTime
+                    .copyWith(color: Colors.white, fontSize: 16.0)),
           ),
         ),
         title: Padding(
@@ -204,7 +178,8 @@ class FavoriteStop extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10.0),
                   gradient: LinearGradient(
                     colors:
-                        state.stops[index].stopLines.data[stopLine].line == 'N'
+                        state.stops[index].stopLines.data[stopLine].label[0] ==
+                                'N'
                             ? [Colors.black, Colors.grey.shade700]
                             : [Colors.blue.shade700, Colors.blue.shade400],
                   ),
@@ -213,7 +188,7 @@ class FavoriteStop extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8.0, vertical: 5.0),
                   child: Text(
-                    state.stops[index].stopLines.data[stopLine].line,
+                    state.stops[index].stopLines.data[stopLine].label,
                     style: AppTheme.lineNumber.copyWith(fontSize: 14.0),
                   ),
                 ),
