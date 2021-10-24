@@ -24,4 +24,15 @@ class FavoritesRepository {
   Future<List<StopInfo>> getAllFavorites() async {
     return await dbService.getAllFavorites();
   }
+
+  bool checkIfFavorite(
+    List<StopInfo> favorites,
+    StopInfo stop,
+  ) {
+    for (var i in favorites) {
+      if (i.label == stop.label) return true;
+    }
+
+    return false;
+  }
 }
