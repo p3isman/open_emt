@@ -1,9 +1,27 @@
+List<String> _romanNumbers = [
+  'i',
+  'v',
+  'x',
+  'l',
+  'c',
+  'd',
+  'm',
+];
+
+bool _isRomanNumber(String string) {
+  for (var i in string.runes) {
+    if (!_romanNumbers.contains(String.fromCharCode(i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
 extension StringExtension on String {
   String capitalize() {
-    if (this[0] == 'x' || (this[0] == 'i' && this[1] == 'i')) {
-      return toUpperCase();
-    }
-    return "${this[0].toUpperCase()}${substring(1)}";
+    return _isRomanNumber(this)
+        ? toUpperCase()
+        : "${this[0].toUpperCase()}${substring(1)}";
   }
 
   String toTitleCase() => replaceAll(RegExp(' +'), ' ')
