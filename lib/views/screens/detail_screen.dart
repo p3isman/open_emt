@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:open_emt/data/models/screen_arguments.dart';
-import 'package:open_emt/data/models/stop_model.dart';
 import 'package:open_emt/domain/bloc/favorite_stops_bloc/favorite_stops_bloc.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
 import 'package:open_emt/domain/repositories/emt_repository.dart';
+import 'package:open_emt/domain/repositories/favorites_repository.dart';
 import 'package:open_emt/main.dart';
 import 'package:open_emt/views/theme/theme.dart';
 import 'package:open_emt/views/widgets/arrive_info.dart';
-import 'package:open_emt/views/widgets/detail_title.dart';
 
 class DetailScreen extends StatelessWidget {
   const DetailScreen({Key? key}) : super(key: key);
@@ -22,15 +21,15 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final StopInfo stopInfo =
-        (ModalRoute.of(context)!.settings.arguments as ScreenArguments)
-            .stopInfo;
+    final String stopId =
+        (ModalRoute.of(context)!.settings.arguments as ScreenArguments).stopId;
 
     final _emtRepository = locator.get<EMTRepository>();
+    final _favoritesRepository = locator.get<FavoritesRepository>();
 
     return Scaffold(
       appBar: AppBar(
-        title: DetailTitle(stopInfo: stopInfo),
+        title: Text('Parada nº$stopId'),
         centerTitle: true,
       ),
       body: Column(
@@ -66,11 +65,21 @@ class DetailScreen extends StatelessWidget {
                 if (state.error != null) {
                   return Text(state.error!.type.toString());
                 }
-                return const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'No es posible obtener información.',
-                    style: AppTheme.errorMessage,
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 40.0,
+                    horizontal: 15.0,
+                  ),
+                  child: Card(
+                    color: Colors.red.shade200,
+                    child: const Padding(
+                      padding: EdgeInsets.all(15.0),
+                      child: Text(
+                        'Error al obtener información sobre la parada.',
+                        style: AppTheme.errorMessage,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   ),
                 );
               } else {
@@ -90,16 +99,19 @@ class DetailScreen extends StatelessWidget {
                   BlocBuilder<FavoriteStopsBloc, FavoriteStopsState>(
                       builder: (context, favoriteStopsState) {
                     if (favoriteStopsState is FavoritesLoadSuccess) {
+                      bool isFavorite = _favoritesRepository.checkIfFavorite(
+                          favoriteStopsState.stops,
+                          state.stopInfo.data.first.stopInfo.first);
                       return FloatingActionButton(
                         heroTag: null,
-                        onPressed: favoriteStopsState.stops.contains(stopInfo)
-                            ? () => context
-                                .read<FavoriteStopsBloc>()
-                                .add(FavoriteDeleted(stopInfo))
-                            : () => context
-                                .read<FavoriteStopsBloc>()
-                                .add(FavoriteAdded(stopInfo)),
-                        child: favoriteStopsState.stops.contains(stopInfo)
+                        onPressed: isFavorite
+                            ? () => context.read<FavoriteStopsBloc>().add(
+                                FavoriteDeleted(
+                                    state.stopInfo.data.first.stopInfo.first))
+                            : () => context.read<FavoriteStopsBloc>().add(
+                                FavoriteAdded(
+                                    state.stopInfo.data.first.stopInfo.first)),
+                        child: isFavorite
                             ? const Icon(Icons.favorite)
                             : const Icon(Icons.favorite_border),
                       );
