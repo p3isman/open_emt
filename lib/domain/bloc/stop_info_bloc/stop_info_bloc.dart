@@ -29,6 +29,7 @@ class StopInfoBloc extends Bloc<StopInfoBlocEvent, StopInfoState> {
       return emit(StopInfoError(error: e));
     }
 
+// When description is a list it means there was an error
     if (stopInfo?.description is List) {
       return emit(const StopInfoError());
     }
