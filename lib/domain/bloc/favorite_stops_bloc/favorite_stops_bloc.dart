@@ -42,7 +42,7 @@ class FavoriteStopsBloc extends Bloc<FavoriteStopsEvent, FavoriteStopsState> {
     emit(FavoritesLoadSuccess(
       stops: (state as FavoritesLoadSuccess)
           .stops
-          .where((stop) => stop != event.stop)
+          .where((stop) => stop.label != event.stop.label)
           .toList(),
     ));
   }
