@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:open_emt/data/models/stop_list_model.dart';
 import 'package:open_emt/data/models/stop_model.dart';
 import 'package:open_emt/data/services/emt_service.dart';
 
@@ -46,8 +47,34 @@ class EMTRepository {
     }
   }
 
+  Future<StopListModel> getStopList() async {
+    if (!isLoggedIn) {
+      try {
+        if (await emtService.login()) {
+          isLoggedIn = true;
+        }
+      } on DioError {
+        rethrow;
+      }
+    }
+
+    try {
+      return await emtService.getStopList();
+    } on DioError {
+      rethrow;
+    }
+  }
+
   List<List<Arrive>> groupArrivesByLine(List<Arrive> arrives) {
     arrives.sort((a, b) => a.line.compareTo(b.line));
+
+    // Check if line has only one arrive value (has no pair)
+    // arrives.retainWhere((element) {
+    //   for (var i in arrives) {
+    //     if (element.line == i.line && element != i) return true;
+    //   }
+    //   return false;
+    // });
 
     List<List<Arrive>> orderedArrives = [];
 
