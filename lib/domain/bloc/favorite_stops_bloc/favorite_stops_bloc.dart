@@ -11,14 +11,14 @@ class FavoriteStopsBloc extends Bloc<FavoriteStopsEvent, FavoriteStopsState> {
 
   FavoriteStopsBloc({required this.favoritesRepository})
       : super(const FavoritesLoadInProgress()) {
-    on<FavoritesInitialize>(_onFavoritesInitialize);
+    on<InitializeFavorites>(_onInitializeFavorites);
     on<FavoriteAdded>(_onFavoriteAdded);
     on<FavoriteDeleted>(_onFavoriteDeleted);
     on<FavoritesAllDeleted>(_onFavoritesAllDeleted);
   }
 
-  void _onFavoritesInitialize(
-      FavoritesInitialize event, Emitter<FavoriteStopsState> emit) async {
+  void _onInitializeFavorites(
+      InitializeFavorites event, Emitter<FavoriteStopsState> emit) async {
     emit(const FavoritesLoadInProgress());
     final List<StopInfo> stops = await favoritesRepository.getAllFavorites();
     emit(FavoritesLoadSuccess(stops: stops));

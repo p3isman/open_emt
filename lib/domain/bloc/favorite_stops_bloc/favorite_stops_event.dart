@@ -4,8 +4,8 @@ abstract class FavoriteStopsEvent extends Equatable {
   const FavoriteStopsEvent();
 }
 
-class FavoritesInitialize extends FavoriteStopsEvent {
-  const FavoritesInitialize();
+class InitializeFavorites extends FavoriteStopsEvent {
+  const InitializeFavorites();
 
   @override
   List<Object?> get props => [];
