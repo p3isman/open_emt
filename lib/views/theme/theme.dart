@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
+  static ThemeData lightTheme = ThemeData(
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Colors.blue,
+      selectedItemColor: Colors.white,
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+    ),
+  );
+
   static const TextStyle title = TextStyle(
     fontWeight: FontWeight.w500,
     fontFamily: 'Poppins',
