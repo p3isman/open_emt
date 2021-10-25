@@ -3,22 +3,26 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:open_emt/data/services/db_service.dart';
 import 'package:open_emt/data/services/emt_service.dart';
+import 'package:open_emt/data/services/location_service.dart';
 import 'package:open_emt/domain/bloc/favorite_stops_bloc/favorite_stops_bloc.dart';
+import 'package:open_emt/domain/bloc/map_bloc/map_bloc.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
 import 'package:open_emt/domain/repositories/emt_repository.dart';
 import 'package:open_emt/domain/repositories/favorites_repository.dart';
+import 'package:open_emt/domain/repositories/location_repository.dart';
 import 'package:open_emt/views/screens/detail_screen.dart';
 import 'package:open_emt/views/screens/home_screen.dart';
+import 'package:open_emt/views/theme/theme.dart';
 
 final GetIt locator = GetIt.instance;
 
 Future<void> _setup() async {
-  locator.registerLazySingleton<DBService>(() => DBService());
-  locator.registerLazySingleton<EMTService>(() => EMTService());
   locator.registerLazySingleton<FavoritesRepository>(
-      () => FavoritesRepository(dbService: locator.get<DBService>()));
+      () => FavoritesRepository(dbService: DBService()));
   locator.registerLazySingleton<EMTRepository>(
-      () => EMTRepository(emtService: locator.get<EMTService>()));
+      () => EMTRepository(emtService: EMTService()));
+  locator.registerLazySingleton<LocationRepository>(
+      () => LocationRepository(locationService: LocationService()));
 }
 
 void main() async {
@@ -37,11 +41,16 @@ class OpenEMT extends StatelessWidget {
         BlocProvider(
           create: (context) => FavoriteStopsBloc(
               favoritesRepository: locator.get<FavoritesRepository>())
-            ..add(const FavoritesInitialize()),
+            ..add(const InitializeFavorites()),
         ),
         BlocProvider(
           create: (context) =>
               StopInfoBloc(emtRepository: locator.get<EMTRepository>()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              MapBloc(locationRepository: locator.get<LocationRepository>())
+                ..add(const InitializeMap()),
         ),
       ],
       child: MaterialApp(
@@ -51,6 +60,7 @@ class OpenEMT extends StatelessWidget {
           HomeScreen.route: (context) => const HomeScreen(),
           DetailScreen.route: (context) => const DetailScreen(),
         },
+        theme: AppTheme.lightTheme,
       ),
     );
   }
