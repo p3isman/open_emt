@@ -1,10 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:latlong2/latlong.dart';
 
 import 'package:open_emt/data/models/screen_arguments.dart';
+import 'package:open_emt/data/models/stop_list_model.dart';
 import 'package:open_emt/domain/bloc/favorite_stops_bloc/favorite_stops_bloc.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
+import 'package:open_emt/domain/repositories/emt_repository.dart';
+import 'package:open_emt/main.dart';
 import 'package:open_emt/utils/utils.dart';
 import 'package:open_emt/views/screens/detail_screen.dart';
 import 'package:open_emt/views/theme/theme.dart';
@@ -24,76 +31,132 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final GlobalKey<FormFieldState> _formFieldKey = GlobalKey<FormFieldState>();
-  final TextEditingController _textEditingController = TextEditingController();
+  final List<Widget> _tabs = [
+    HomeTab(), // see the HomeTab class below
+    const MapTab() //, see the SettingsTab class below
+  ];
+
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('OpenEMT')),
-      body: BlocBuilder<StopInfoBloc, StopInfoState>(
-        builder: (context, state) {
-          return ListView(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 20.0,
-                  horizontal: 10.0,
-                ),
-                child: TextFormField(
-                  key: _formFieldKey,
-                  controller: _textEditingController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                      labelText: 'Número de parada',
-                      hintText: 'Introduce un código de parada.',
-                      border: OutlineInputBorder(),
-                      icon: FaIcon(FontAwesomeIcons.bus)),
-                  validator: (text) {
-                    if (text!.isEmpty) {
-                      return 'Introduce un número de parada.';
-                    }
-                    text = text.trim();
-                    if (text == '' ||
-                        text.contains('.') ||
-                        !isNumeric(text) ||
-                        int.parse(text) <= 0) {
-                      return 'Parada no válida.';
-                    }
-                  },
-                  onFieldSubmitted: (text) {
-                    if (_formFieldKey.currentState!.validate()) {
-                      context
-                          .read<StopInfoBloc>()
-                          .add(GetStopInfo(stopId: text));
-                      Navigator.pushNamed(context, DetailScreen.route,
-                          arguments: ScreenArguments(stopId: text));
-                    }
-                  },
-                ),
-              ),
-              BlocBuilder<FavoriteStopsBloc, FavoriteStopsState>(
-                  builder: (context, state) {
-                if (state is FavoritesLoadSuccess) {
-                  return Column(
-                    children: List.generate(
-                      state.stops.length,
-                      (index) => Column(
-                        children: [
-                          if (index != 0) const Divider(),
-                          FavoriteStop(state, index),
-                        ],
-                      ),
-                    ),
-                  );
-                } else {
-                  return const SizedBox.shrink();
-                }
-              })
-            ],
-          );
-        },
+      body: _tabs[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        items: const [
+          BottomNavigationBarItem(label: 'Inicio', icon: Icon(Icons.home)),
+          BottomNavigationBarItem(label: 'Mapa', icon: Icon(Icons.map)),
+        ],
+        onTap: (index) => setState(() {
+          _currentIndex = index;
+        }),
       ),
+      floatingActionButton: _currentIndex == 1
+          ? FloatingActionButton(
+              onPressed: () {}, child: const Icon(Icons.gps_fixed))
+          : null,
+    );
+  }
+}
+
+class HomeTab extends StatelessWidget {
+  final GlobalKey<FormFieldState> _formFieldKey = GlobalKey<FormFieldState>();
+  final TextEditingController _textEditingController = TextEditingController();
+
+  HomeTab({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
+    return BlocBuilder<StopInfoBloc, StopInfoState>(
+      builder: (context, state) {
+        return ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 20.0,
+                horizontal: 10.0,
+              ),
+              child: TextFormField(
+                key: _formFieldKey,
+                controller: _textEditingController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                    labelText: 'Número de parada',
+                    hintText: 'Introduce un código de parada.',
+                    border: OutlineInputBorder(),
+                    icon: FaIcon(FontAwesomeIcons.bus)),
+                validator: (text) {
+                  if (text!.isEmpty) {
+                    return 'Introduce un número de parada.';
+                  }
+                  text = text.trim();
+                  if (text == '' ||
+                      text.contains('.') ||
+                      !isNumeric(text) ||
+                      int.parse(text) <= 0) {
+                    return 'Parada no válida.';
+                  }
+                },
+                onFieldSubmitted: (text) {
+                  if (_formFieldKey.currentState!.validate()) {
+                    context.read<StopInfoBloc>().add(GetStopInfo(stopId: text));
+                    Navigator.pushNamed(context, DetailScreen.route,
+                        arguments: ScreenArguments(stopId: text));
+                  }
+                },
+              ),
+            ),
+            BlocBuilder<FavoriteStopsBloc, FavoriteStopsState>(
+                builder: (context, state) {
+              if (state is FavoritesLoadSuccess) {
+                return state.stops.isEmpty
+                    ? Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 15.0,
+                              vertical: 40.0,
+                            ),
+                            child: Text(
+                                'Marca paradas como favoritas para verlas aquí',
+                                style: AppTheme.title),
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: EdgeInsets.only(right: size.width * 0.1),
+                              child: SvgPicture.asset(
+                                'assets/bus.svg',
+                                width: size.width * 0.55,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: List.generate(
+                          state.stops.length,
+                          (index) => Column(
+                            children: [
+                              if (index != 0) const Divider(),
+                              FavoriteStop(state, index),
+                            ],
+                          ),
+                        ),
+                      );
+              } else {
+                return const SizedBox.shrink();
+              }
+            })
+          ],
+        );
+      },
     );
   }
 }
@@ -198,5 +261,70 @@ class FavoriteStop extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class MapTab extends StatelessWidget {
+  const MapTab({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: locator.get<EMTRepository>().getStopList(),
+        builder: (context, snapshot) {
+          List<Marker> markers = [];
+          if (snapshot.hasData) {
+            for (var i in (snapshot.data as StopListModel).data) {
+              markers.add(
+                Marker(
+                  point: LatLng(
+                    i.geometry.coordinates.last,
+                    i.geometry.coordinates.first,
+                  ),
+                  builder: (ctx) => GestureDetector(
+                    onTap: () {
+                      ctx.read<StopInfoBloc>().add(GetStopInfo(stopId: i.node));
+                      Navigator.pushNamed(context, DetailScreen.route,
+                          arguments: ScreenArguments(stopId: i.node));
+                    },
+                    child: const Card(
+                      child: Center(
+                        child: FaIcon(
+                          FontAwesomeIcons.bus,
+                          size: 18.0,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
+
+          return FlutterMap(
+            options: MapOptions(
+              center: LatLng(40.41317, -3.68307),
+              zoom: 15.0,
+              interactiveFlags: InteractiveFlag.drag |
+                  InteractiveFlag.pinchZoom |
+                  InteractiveFlag.doubleTapZoom,
+            ),
+            layers: [
+              TileLayerOptions(
+                urlTemplate:
+                    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                subdomains: ['a', 'b', 'c'],
+                attributionBuilder: (_) {
+                  return const Text("© OpenStreetMap contributors",
+                      style: TextStyle(color: Colors.grey));
+                },
+              ),
+              MarkerLayerOptions(
+                markers: markers,
+              ),
+            ],
+          );
+        });
   }
 }
