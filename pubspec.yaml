@@ -40,6 +40,8 @@ dependencies:
   font_awesome_flutter: ^9.1.0
   sqflite: ^2.0.0+4
   path_provider: ^2.0.5
+  flutter_svg: ^0.23.0+1
+  flutter_map: ^0.14.0
 
 dev_dependencies:
   flutter_test:
@@ -63,8 +65,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - assets/
+  assets:
+    - assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
