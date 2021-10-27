@@ -1,4 +1,4 @@
-import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:open_emt/data/services/location_service.dart';
 
 class LocationRepository {
@@ -6,7 +6,7 @@ class LocationRepository {
 
   LocationRepository({required this.locationService});
 
-  Future<LocationData?> getLocation() async {
-    return await locationService.getLocation();
+  Future<Position> getCurrentPosition() async {
+    return await locationService.getCurrentPosition();
   }
 }
