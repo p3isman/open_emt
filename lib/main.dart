@@ -48,9 +48,10 @@ class OpenEMT extends StatelessWidget {
               StopInfoBloc(emtRepository: locator.get<EMTRepository>()),
         ),
         BlocProvider(
-          create: (context) =>
-              MapBloc(locationRepository: locator.get<LocationRepository>())
-                ..add(const InitializeMap()),
+          create: (context) => MapBloc(
+            locationRepository: locator.get<LocationRepository>(),
+            emtRepository: locator.get<EMTRepository>(),
+          )..add(const InitializeMap()),
         ),
       ],
       child: MaterialApp(
