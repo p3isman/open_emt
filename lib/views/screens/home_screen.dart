@@ -7,9 +7,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:open_emt/data/models/screen_arguments.dart';
+import 'package:open_emt/data/models/stop_list_model.dart';
 import 'package:open_emt/domain/bloc/favorite_stops_bloc/favorite_stops_bloc.dart';
-import 'package:open_emt/domain/bloc/map_bloc/map_bloc.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
+import 'package:open_emt/domain/repositories/emt_repository.dart';
+import 'package:open_emt/main.dart';
 import 'package:open_emt/utils/utils.dart';
 import 'package:open_emt/views/screens/detail_screen.dart';
 import 'package:open_emt/views/theme/theme.dart';
@@ -44,22 +46,17 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         items: const [
-          BottomNavigationBarItem(label: 'Inicio', icon: Icon(Icons.search)),
+          BottomNavigationBarItem(label: 'Inicio', icon: Icon(Icons.home)),
           BottomNavigationBarItem(label: 'Mapa', icon: Icon(Icons.map)),
         ],
         onTap: (index) => setState(() {
           _currentIndex = index;
         }),
       ),
-      floatingActionButton:
-          BlocBuilder<MapBloc, MapState>(builder: (context, state) {
-        return _currentIndex == 1 && (state is MapLoaded)
-            ? FloatingActionButton(
-                onPressed: () => context.read<MapBloc>().add(const CenterMap()),
-                child: const Icon(Icons.gps_fixed),
-              )
-            : const SizedBox.shrink();
-      }),
+      floatingActionButton: _currentIndex == 1
+          ? FloatingActionButton(
+              onPressed: () {}, child: const Icon(Icons.gps_fixed))
+          : null,
     );
   }
 }
@@ -76,88 +73,90 @@ class HomeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    return ListView(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 20.0,
-            horizontal: 10.0,
-          ),
-          child: TextFormField(
-            key: _formFieldKey,
-            controller: _textEditingController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-                labelText: 'Número de parada',
-                hintText: 'Introduce un código de parada.',
-                border: OutlineInputBorder(),
-                icon: FaIcon(FontAwesomeIcons.bus)),
-            validator: (text) {
-              if (text!.isEmpty) {
-                return 'Introduce un número de parada.';
-              }
-              text = text.trim();
-              if (text == '' ||
-                  text.contains('.') ||
-                  !isNumeric(text) ||
-                  int.parse(text) <= 0) {
-                return 'Parada no válida.';
-              }
-            },
-            onFieldSubmitted: (text) {
-              if (_formFieldKey.currentState!.validate()) {
-                // Remove leading zeros
-                text = text.replaceFirst(RegExp(r'^0+'), '');
-                context.read<StopInfoBloc>().add(GetStopInfo(stopId: text));
-                Navigator.pushNamed(context, DetailScreen.route,
-                    arguments: ScreenArguments(stopId: text));
-              }
-            },
-          ),
-        ),
-        BlocBuilder<FavoriteStopsBloc, FavoriteStopsState>(
-            builder: (context, state) {
-          if (state is FavoritesLoadSuccess) {
-            return state.stops.isEmpty
-                ? Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 15.0,
-                          vertical: 40.0,
-                        ),
-                        child: Text(
-                            'Marca paradas como favoritas para verlas aquí',
-                            style: AppTheme.title),
-                      ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: EdgeInsets.only(right: size.width * 0.1),
-                          child: SvgPicture.asset(
-                            'assets/bus.svg',
-                            width: size.width * 0.55,
+    return BlocBuilder<StopInfoBloc, StopInfoState>(
+      builder: (context, state) {
+        return ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 20.0,
+                horizontal: 10.0,
+              ),
+              child: TextFormField(
+                key: _formFieldKey,
+                controller: _textEditingController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                    labelText: 'Número de parada',
+                    hintText: 'Introduce un código de parada.',
+                    border: OutlineInputBorder(),
+                    icon: FaIcon(FontAwesomeIcons.bus)),
+                validator: (text) {
+                  if (text!.isEmpty) {
+                    return 'Introduce un número de parada.';
+                  }
+                  text = text.trim();
+                  if (text == '' ||
+                      text.contains('.') ||
+                      !isNumeric(text) ||
+                      int.parse(text) <= 0) {
+                    return 'Parada no válida.';
+                  }
+                },
+                onFieldSubmitted: (text) {
+                  if (_formFieldKey.currentState!.validate()) {
+                    context.read<StopInfoBloc>().add(GetStopInfo(stopId: text));
+                    Navigator.pushNamed(context, DetailScreen.route,
+                        arguments: ScreenArguments(stopId: text));
+                  }
+                },
+              ),
+            ),
+            BlocBuilder<FavoriteStopsBloc, FavoriteStopsState>(
+                builder: (context, state) {
+              if (state is FavoritesLoadSuccess) {
+                return state.stops.isEmpty
+                    ? Column(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 15.0,
+                              vertical: 40.0,
+                            ),
+                            child: Text(
+                                'Marca paradas como favoritas para verlas aquí',
+                                style: AppTheme.title),
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: EdgeInsets.only(right: size.width * 0.1),
+                              child: SvgPicture.asset(
+                                'assets/bus.svg',
+                                width: size.width * 0.55,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        children: List.generate(
+                          state.stops.length,
+                          (index) => Column(
+                            children: [
+                              if (index != 0) const Divider(),
+                              FavoriteStop(state, index),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
-                  )
-                : Column(
-                    children: List.generate(
-                      state.stops.length,
-                      (index) => Column(
-                        children: [
-                          if (index != 0) const Divider(),
-                          FavoriteStop(state, index),
-                        ],
-                      ),
-                    ),
-                  );
-          } else {
-            return const SizedBox.shrink();
-          }
-        })
-      ],
+                      );
+              } else {
+                return const SizedBox.shrink();
+              }
+            })
+          ],
+        );
+      },
     );
   }
 }
@@ -270,40 +269,62 @@ class MapTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Declare mapController each time the map is built and then change its value to avoid an 'already initialized' bug.
-    MapController? mapController;
+    return FutureBuilder(
+        future: locator.get<EMTRepository>().getStopList(),
+        builder: (context, snapshot) {
+          List<Marker> markers = [];
+          if (snapshot.hasData) {
+            for (var i in (snapshot.data as StopListModel).data) {
+              markers.add(
+                Marker(
+                  point: LatLng(
+                    i.geometry.coordinates.last,
+                    i.geometry.coordinates.first,
+                  ),
+                  builder: (ctx) => GestureDetector(
+                    onTap: () {
+                      ctx.read<StopInfoBloc>().add(GetStopInfo(stopId: i.node));
+                      Navigator.pushNamed(context, DetailScreen.route,
+                          arguments: ScreenArguments(stopId: i.node));
+                    },
+                    child: const Card(
+                      child: Center(
+                        child: FaIcon(
+                          FontAwesomeIcons.bus,
+                          size: 18.0,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
 
-    return BlocBuilder<MapBloc, MapState>(builder: (context, state) {
-      if (state is MapLoading) {
-        return const Center(child: CircularProgressIndicator());
-      } else if (state is MapLoaded) {
-        return FlutterMap(
-          key: UniqueKey(),
-          mapController: mapController,
-          options: MapOptions(
-            onMapCreated: (controller) => controller = state.mapController,
-            center: LatLng(40.41317, -3.68307),
-            zoom: 15.0,
-            interactiveFlags: InteractiveFlag.drag |
-                InteractiveFlag.pinchZoom |
-                InteractiveFlag.doubleTapZoom,
-          ),
-          layers: [
-            TileLayerOptions(
-              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-              subdomains: ['a', 'b', 'c'],
-              attributionBuilder: (_) {
-                return const Text("© OpenStreetMap contributors",
-                    style: TextStyle(color: Colors.grey));
-              },
+          return FlutterMap(
+            options: MapOptions(
+              center: LatLng(40.41317, -3.68307),
+              zoom: 15.0,
+              interactiveFlags: InteractiveFlag.drag |
+                  InteractiveFlag.pinchZoom |
+                  InteractiveFlag.doubleTapZoom,
             ),
-            MarkerLayerOptions(
-              markers: state.markers,
-            ),
-          ],
-        );
-      }
-      return const SizedBox.shrink();
-    });
+            layers: [
+              TileLayerOptions(
+                urlTemplate:
+                    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                subdomains: ['a', 'b', 'c'],
+                attributionBuilder: (_) {
+                  return const Text("© OpenStreetMap contributors",
+                      style: TextStyle(color: Colors.grey));
+                },
+              ),
+              MarkerLayerOptions(
+                markers: markers,
+              ),
+            ],
+          );
+        });
   }
 }
