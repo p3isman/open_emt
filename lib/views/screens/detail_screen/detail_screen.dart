@@ -7,7 +7,7 @@ import 'package:open_emt/domain/repositories/emt_repository.dart';
 import 'package:open_emt/domain/repositories/favorites_repository.dart';
 import 'package:open_emt/main.dart';
 import 'package:open_emt/views/theme/theme.dart';
-import 'package:open_emt/views/widgets/arrive_info.dart';
+import 'package:open_emt/views/screens/detail_screen/widgets/arrive_info.dart';
 
 class DetailScreen extends StatelessWidget {
   const DetailScreen({Key? key}) : super(key: key);
