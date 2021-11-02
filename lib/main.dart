@@ -46,6 +46,7 @@ class OpenEMT extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'OpenEMT',
+        debugShowCheckedModeBanner: false,
         initialRoute: HomeScreen.route,
         routes: {
           HomeScreen.route: (context) => const HomeScreen(),
