@@ -1,6 +1,7 @@
-import 'dart:async';
-
+import 'package:clippy_flutter/clippy_flutter.dart';
+import 'package:custom_info_window/custom_info_window.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:open_emt/data/models/screen_arguments.dart';
 import 'package:open_emt/data/models/stop_list_model.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:open_emt/domain/repositories/emt_repository.dart';
 import 'package:open_emt/main.dart';
 import 'package:open_emt/views/screens/detail_screen/detail_screen.dart';
+import 'package:open_emt/views/theme/theme.dart';
 
 class MapTab extends StatefulWidget {
   const MapTab({Key? key}) : super(key: key);
@@ -19,54 +21,193 @@ class MapTab extends StatefulWidget {
 }
 
 class _MapTabState extends State<MapTab> {
-  final Completer<GoogleMapController> _controller = Completer();
+  // Default controller
+  // final Completer<GoogleMapController> _controller = Completer();
+
+  final CustomInfoWindowController _customInfoWindowController =
+      CustomInfoWindowController();
+
+  @override
+  void dispose() {
+    _customInfoWindowController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: locator.get<EMTRepository>().getStopList(),
-      builder: (BuildContext context, AsyncSnapshot<StopListModel> snapshot) {
-        if (snapshot.hasData) {
-          final Set<Marker> markers = _createMarkers(context, snapshot.data!);
-          return GoogleMap(
-            myLocationEnabled: true,
-            markers: markers,
-            initialCameraPosition: const CameraPosition(
-              target: LatLng(40.41317, -3.68307),
-              zoom: 15.0,
-            ),
-            onMapCreated: (GoogleMapController controller) {
-              if (!_controller.isCompleted) {
-                _controller.complete(controller);
-              }
-            },
-          );
-        }
-        return const SizedBox.shrink();
-      },
+    return Stack(
+      children: [
+        FutureBuilder(
+          future: locator.get<EMTRepository>().getStopList(),
+          builder:
+              (BuildContext context, AsyncSnapshot<StopListModel> snapshot) {
+            if (snapshot.hasData) {
+              return Stack(
+                children: [
+                  GoogleMap(
+                      onTap: (position) {
+                        _customInfoWindowController.hideInfoWindow!();
+                      },
+                      onCameraMove: (position) {
+                        _customInfoWindowController.onCameraMove!();
+                      },
+                      myLocationEnabled: true,
+                      minMaxZoomPreference:
+                          const MinMaxZoomPreference(15.0, null),
+                      markers: _createMarkers(
+                        context,
+                        snapshot.data!,
+                        _customInfoWindowController,
+                      ),
+                      initialCameraPosition: const CameraPosition(
+                        target: LatLng(40.41317, -3.68307),
+                        zoom: 15.0,
+                      ),
+                      onMapCreated: (GoogleMapController controller) {
+                        _customInfoWindowController.googleMapController ??=
+                            controller;
+                      }),
+                  CustomInfoWindow(
+                    controller: _customInfoWindowController,
+                    offset: 0.0,
+                    height: 150,
+                    width: 300,
+                  ),
+                ],
+              );
+            }
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
+      ],
     );
   }
 
-  Set<Marker> _createMarkers(BuildContext context, StopListModel stopList) {
+  Set<Marker> _createMarkers(
+    BuildContext context,
+    StopListModel stopList,
+    CustomInfoWindowController customInfoWindowController,
+  ) {
     Set<Marker> markers = <Marker>{};
 
     for (var i in stopList.data) {
+      final LatLng position = LatLng(
+        i.geometry.coordinates.last,
+        i.geometry.coordinates.first,
+      );
+
       markers.add(
         Marker(
           markerId: MarkerId('stop-${i.node}'),
-          position: LatLng(
-            i.geometry.coordinates.last,
-            i.geometry.coordinates.first,
+          onTap: () => customInfoWindowController.addInfoWindow!(
+            GestureDetector(
+              onTap: () {
+                context.read<StopInfoBloc>().add(GetStopInfo(stopId: i.node));
+                Navigator.pushNamed(context, DetailScreen.route,
+                    arguments: ScreenArguments(stopId: i.node));
+              },
+              child: Column(
+                children: [
+                  Card(
+                    margin: EdgeInsets.zero,
+                    color: Colors.grey.shade50,
+                    elevation: 10.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const FaIcon(
+                                FontAwesomeIcons.bus,
+                                color: Colors.blue,
+                                size: 12.0,
+                              ),
+                              const SizedBox(width: 5.0),
+                              Text(i.name),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: Wrap(
+                            children: List.generate(
+                              i.lines.length,
+                              (stopLine) => Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                elevation: 4.0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    gradient: LinearGradient(
+                                      colors: i.lines[stopLine].characters
+                                                  .first ==
+                                              'N'
+                                          ? [Colors.black, Colors.grey.shade700]
+                                          : [
+                                              Colors.blue.shade700,
+                                              Colors.blue.shade400
+                                            ],
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5.0, vertical: 3.0),
+                                    child: Text(
+                                      i.lines[stopLine].substring(
+                                          0, i.lines[stopLine].length - 2),
+                                      style: AppTheme.lineNumber
+                                          .copyWith(fontSize: 10.0),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Triangle.isosceles(
+                    edge: Edge.BOTTOM,
+                    child: Container(
+                      color: Colors.grey.shade50,
+                      width: 20.0,
+                      height: 10.0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            position,
           ),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
-          onTap: () {
-            context.read<StopInfoBloc>().add(GetStopInfo(stopId: i.node));
-            Navigator.pushNamed(context, DetailScreen.route,
-                arguments: ScreenArguments(stopId: i.node));
-          },
+          position: position,
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         ),
       );
     }
     return markers;
   }
+
+  // Future<BitmapDescriptor> _getCustomIcon(GlobalKey iconKey) async {
+  //   Future<Uint8List> _capturePng(GlobalKey iconKey) async {
+  //     RenderRepaintBoundary boundary =
+  //         iconKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+  //     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+  //     ByteData? byteData =
+  //         await image.toByteData(format: ui.ImageByteFormat.png);
+  //     var pngBytes = byteData!.buffer.asUint8List();
+  //     return pngBytes;
+  //   }
+
+  //   Uint8List imageData = await _capturePng(iconKey);
+  //   return BitmapDescriptor.fromBytes(imageData);
+  // }
 }
