@@ -42,6 +42,8 @@ dependencies:
   path_provider: ^2.0.5
   flutter_svg: ^0.23.0+1
   google_maps_flutter: ^2.0.11
+  custom_info_window: ^1.0.1
+  clippy_flutter: ^2.0.0-nullsafety.1
 
 dev_dependencies:
   flutter_test:
