@@ -45,3 +45,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 pubspec.lock
+
+# Credentials
+lib/data/credentials.dart
