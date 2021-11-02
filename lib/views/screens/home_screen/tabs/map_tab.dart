@@ -71,7 +71,7 @@ class _MapTabState extends State<MapTab> {
                     controller: _customInfoWindowController,
                     offset: 0.0,
                     height: 150,
-                    width: 300,
+                    width: 200,
                   ),
                 ],
               );
@@ -96,6 +96,10 @@ class _MapTabState extends State<MapTab> {
         i.geometry.coordinates.first,
       );
 
+      // Sort line numbers
+      i.lines.sort((a, b) => int.parse(a.substring(0, a.length - 2))
+          .compareTo(int.parse(b.substring(0, b.length - 2))));
+
       markers.add(
         Marker(
           markerId: MarkerId('stop-${i.node}'),
@@ -115,63 +119,80 @@ class _MapTabState extends State<MapTab> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15.0),
                     ),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const FaIcon(
-                                FontAwesomeIcons.bus,
-                                color: Colors.blue,
-                                size: 12.0,
-                              ),
-                              const SizedBox(width: 5.0),
-                              Text(i.name),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5.0),
-                          child: Wrap(
-                            children: List.generate(
-                              i.lines.length,
-                              (stopLine) => Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5.0),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 5.0),
+                                  child: FaIcon(
+                                    FontAwesomeIcons.bus,
+                                    color: Colors.blue,
+                                    size: 12.0,
+                                  ),
                                 ),
-                                elevation: 4.0,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    gradient: LinearGradient(
-                                      colors: i.lines[stopLine].characters
-                                                  .first ==
-                                              'N'
-                                          ? [Colors.black, Colors.grey.shade700]
-                                          : [
-                                              Colors.blue.shade700,
-                                              Colors.blue.shade400
-                                            ],
+                                Flexible(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Text(
+                                      i.name,
+                                      style: AppTheme.waitingTimeSecondary,
                                     ),
                                   ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 5.0, vertical: 3.0),
-                                    child: Text(
-                                      i.lines[stopLine].substring(
-                                          0, i.lines[stopLine].length - 2),
-                                      style: AppTheme.lineNumber
-                                          .copyWith(fontSize: 10.0),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 5.0),
+                            child: Wrap(
+                              children: List.generate(
+                                i.lines.length,
+                                (stopLine) => Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  elevation: 4.0,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      gradient: LinearGradient(
+                                        colors: i.lines[stopLine].characters
+                                                    .first ==
+                                                'N'
+                                            ? [
+                                                Colors.black,
+                                                Colors.grey.shade700
+                                              ]
+                                            : [
+                                                Colors.blue.shade700,
+                                                Colors.blue.shade400
+                                              ],
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5.0, vertical: 5.0),
+                                      child: Text(
+                                        i.lines[stopLine].substring(
+                                            0, i.lines[stopLine].length - 2),
+                                        style: AppTheme.lineNumber
+                                            .copyWith(fontSize: 10.0),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   Triangle.isosceles(
