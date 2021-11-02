@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static ThemeData lightTheme = ThemeData(
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Colors.blue,
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.transparent,
+      elevation: 0.0,
       selectedItemColor: Colors.white,
       showSelectedLabels: false,
       showUnselectedLabels: false,
@@ -13,6 +15,12 @@ class AppTheme {
   static const TextStyle title = TextStyle(
     fontWeight: FontWeight.w500,
     fontFamily: 'Poppins',
+    fontSize: 22.0,
+  );
+
+  static const TextStyle appBarTitle = TextStyle(
+    fontWeight: FontWeight.w500,
+    fontFamily: 'Metropolis',
     fontSize: 22.0,
   );
 
