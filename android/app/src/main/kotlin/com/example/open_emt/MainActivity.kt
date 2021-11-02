@@ -1,4 +1,4 @@
-package com.example.open_emt
+package com.magusstudio.open_emt
 
 import io.flutter.embedding.android.FlutterActivity
 
