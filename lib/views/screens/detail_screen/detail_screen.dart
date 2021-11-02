@@ -29,8 +29,22 @@ class DetailScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Parada nº$stopId'),
+        title: Text(
+          'Parada nº$stopId',
+          style: AppTheme.appBarTitle,
+        ),
         centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: <Color>[
+                  Colors.blue,
+                  Colors.blue.shade900,
+                ]),
+          ),
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
