@@ -30,7 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('OpenEMT')),
-      body: _tabs[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _tabs,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         items: const [
