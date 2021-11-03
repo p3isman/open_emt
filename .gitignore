@@ -47,4 +47,4 @@ app.*.map.json
 pubspec.lock
 
 # Credentials
-lib/data/credentials.dart
+/lib/data/credentials.dart
