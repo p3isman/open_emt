@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:open_emt/data/models/screen_arguments.dart';
+import 'package:open_emt/data/repositories/emt_repository.dart';
 import 'package:open_emt/domain/bloc/favorite_stops_bloc/favorite_stops_bloc.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
-import 'package:open_emt/domain/repositories/emt_repository.dart';
-import 'package:open_emt/domain/repositories/favorites_repository.dart';
 import 'package:open_emt/main.dart';
 import 'package:open_emt/views/theme/theme.dart';
 import 'package:open_emt/views/screens/detail_screen/widgets/arrive_info.dart';
@@ -25,7 +24,6 @@ class DetailScreen extends StatelessWidget {
         (ModalRoute.of(context)!.settings.arguments as ScreenArguments).stopId;
 
     final _emtRepository = locator.get<EMTRepository>();
-    final _favoritesRepository = locator.get<FavoritesRepository>();
 
     return Scaffold(
       appBar: AppBar(
@@ -113,9 +111,14 @@ class DetailScreen extends StatelessWidget {
                   BlocBuilder<FavoriteStopsBloc, FavoriteStopsState>(
                       builder: (context, favoriteStopsState) {
                     if (favoriteStopsState is FavoritesLoadSuccess) {
-                      bool isFavorite = _favoritesRepository.checkIfFavorite(
-                          favoriteStopsState.stops,
-                          state.stopInfo.data.first.stopInfo.first);
+                      bool isFavorite = false;
+                      for (var element in favoriteStopsState.stops) {
+                        if (element.label ==
+                            state.stopInfo.data.first.stopInfo.first.label) {
+                          isFavorite = true;
+                          break;
+                        }
+                      }
                       return FloatingActionButton(
                         heroTag: null,
                         onPressed: isFavorite

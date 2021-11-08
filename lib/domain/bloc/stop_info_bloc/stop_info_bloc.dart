@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:open_emt/data/models/stop_model.dart';
-import 'package:open_emt/domain/repositories/emt_repository.dart';
+import 'package:open_emt/data/repositories/emt_repository.dart';
 
 part 'stop_info_event.dart';
 part 'stop_info_state.dart';
@@ -30,7 +30,7 @@ class StopInfoBloc extends Bloc<StopInfoBlocEvent, StopInfoState> {
     }
 
 // When description is a list it means there was an error
-    if (stopInfo?.description is List) {
+    if (stopInfo.description is List) {
       return emit(const StopInfoError());
     }
 

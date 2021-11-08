@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:open_emt/data/models/stop_model.dart';
-import 'package:open_emt/domain/repositories/favorites_repository.dart';
+import 'package:open_emt/data/repositories/favorites_repository.dart';
 
 part 'favorite_stops_event.dart';
 part 'favorite_stops_state.dart';

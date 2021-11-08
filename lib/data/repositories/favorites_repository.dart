@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:open_emt/data/models/stop_model.dart';
+import 'package:open_emt/domain/repositories/i_favorites_repository.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
-class DBService {
+class FavoritesRepository implements IFavoritesRepository {
   static Database? _database;
   String _path = '';
 
@@ -40,7 +41,8 @@ class DBService {
   }
 
 // INSERTS
-  Future<int> addFavorite(StopInfo stopInfo) async {
+  @override
+  Future<int> addToFavorites(StopInfo stopInfo) async {
     final db = await database;
     final res =
         await db!.insert('Favorites', {'stop': jsonEncode(stopInfo.toJson())});
@@ -50,6 +52,7 @@ class DBService {
   }
 
 // SELECTS
+  @override
   Future<List<StopInfo>> getAllFavorites() async {
     final db = await database;
 
@@ -64,6 +67,7 @@ class DBService {
   }
 
 // DELETES
+  @override
   Future<int> deleteFavorite(StopInfo stop) async {
     final db = await database;
     final res = await db!
@@ -72,6 +76,7 @@ class DBService {
     return res;
   }
 
+  @override
   Future<int> deleteAllFavorites() async {
     final db = await database;
     final res = await db!.delete('Favorites');

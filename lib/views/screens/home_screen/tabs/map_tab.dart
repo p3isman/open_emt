@@ -5,10 +5,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:open_emt/data/models/screen_arguments.dart';
 import 'package:open_emt/data/models/stop_list_model.dart';
+import 'package:open_emt/data/repositories/emt_repository.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:open_emt/domain/repositories/emt_repository.dart';
 import 'package:open_emt/main.dart';
 import 'package:open_emt/views/screens/detail_screen/detail_screen.dart';
 import 'package:open_emt/views/theme/theme.dart';
