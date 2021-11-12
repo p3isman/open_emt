@@ -30,4 +30,4 @@
 </table>
 
 ## Downloads
-[Google Play](https://play.google.com/store/apps/details?id=com.magusstudio.open_emt)
+<a href="https://play.google.com/store/apps/details?id=com.magusstudio.open_emt" target="_blank">Google Play</a>
