@@ -1,16 +1,26 @@
-# open_emt
+# Open EMT
+A free and open source app to check Madrid EMT info.
 
-A new Flutter project.
+## Features
+🚏 • See bus stops near you.\
+⏳ • Check waiting times of any stop.\
+📍 • Get info on any stop or stoplines.\
+📝 • Save your favorite stops to check them later.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Screenshots
+<table>
+  <tr>
+    <td>
+      <img src="https://user-images.githubusercontent.com/33253306/141458535-88900c5b-b8f2-466b-a971-919bcc98640a.png">
+    </td>
+    <td>
+      <img src="https://user-images.githubusercontent.com/33253306/141458540-0465dd99-f3af-417e-bd70-0df807d251e1.png">
+    </td>
+    <td>
+      <img src="https://user-images.githubusercontent.com/33253306/141458545-3e206086-baab-45de-acf6-a0b8ce739aeb.png">
+    </td>
+    <td>
+      <img src="https://user-images.githubusercontent.com/33253306/141458550-cca462f0-b986-4feb-bec4-85f73f94d0f3.png">
+    </td>
+  </tr>
+</table>
