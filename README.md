@@ -1,5 +1,9 @@
-# Open EMT
-A free and open source app to check Madrid EMT info.
+<h1 align="center" border-bottom="none">OpenEMT</h1>
+<p align="center">A free and open source app to check Madrid EMT info.</p>
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-android%20%7C%20iOS-green">
+  <img src= "https://img.shields.io/github/license/p3isman/open_emt">
+</p>
 
 ## Features
 🚏 • See bus stops near you.\
@@ -24,3 +28,6 @@ A free and open source app to check Madrid EMT info.
     </td>
   </tr>
 </table>
+
+## Downloads
+[Google Play](https://play.google.com/store/apps/details?id=com.magusstudio.open_emt)
