@@ -46,6 +46,7 @@ dependencies:
   clippy_flutter: ^2.0.0-nullsafety.1
   fluster: ^1.2.0
   location: ^4.3.0
+  shared_preferences: ^2.0.8
 
 dev_dependencies:
   flutter_test:
