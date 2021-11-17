@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+
 import 'package:open_emt/data/repositories/emt_repository.dart';
 import 'package:open_emt/data/repositories/favorites_repository.dart';
-
+import 'package:open_emt/domain/cubit/theme_cubit/theme_cubit.dart';
 import 'package:open_emt/domain/bloc/favorite_stops_bloc/favorite_stops_bloc.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
 import 'package:open_emt/views/screens/detail_screen/detail_screen.dart';
@@ -32,6 +33,9 @@ class OpenEMT extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
+          create: (context) => ThemeCubit()..init(),
+        ),
+        BlocProvider(
           create: (context) => FavoriteStopsBloc(
               favoritesRepository: locator.get<FavoritesRepository>())
             ..add(const InitializeFavorites()),
@@ -41,15 +45,20 @@ class OpenEMT extends StatelessWidget {
               StopInfoBloc(emtRepository: locator.get<EMTRepository>()),
         ),
       ],
-      child: MaterialApp(
-        title: 'OpenEMT',
-        debugShowCheckedModeBanner: false,
-        initialRoute: HomeScreen.route,
-        routes: {
-          HomeScreen.route: (context) => const HomeScreen(),
-          DetailScreen.route: (context) => const DetailScreen(),
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp(
+            title: 'OpenEMT',
+            debugShowCheckedModeBanner: false,
+            initialRoute: HomeScreen.route,
+            routes: {
+              HomeScreen.route: (context) => const HomeScreen(),
+              DetailScreen.route: (context) => const DetailScreen(),
+            },
+            theme:
+                state is ThemeDark ? AppTheme.darkTheme : AppTheme.lightTheme,
+          );
         },
-        theme: AppTheme.lightTheme,
       ),
     );
   }
