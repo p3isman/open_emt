@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:open_emt/domain/cubit/theme_cubit/theme_cubit.dart';
 
 import 'package:open_emt/views/screens/home_screen/tabs/home_tab.dart';
 import 'package:open_emt/views/screens/home_screen/tabs/map_tab.dart';
@@ -29,49 +32,66 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'OpenEMT',
-          style: AppTheme.appBarTitle,
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: <Color>[
-                  Colors.blue,
-                  Colors.blue.shade900,
-                ]),
+    return BlocBuilder<ThemeCubit, ThemeState>(
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'OpenEMT',
+              style: AppTheme.appBarTitle,
+            ),
+            flexibleSpace: (state is ThemeDark)
+                ? AppTheme.appBarDarkFlexibleSpace
+                : AppTheme.appBarLightFlexibleSpace,
           ),
-        ),
-      ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _tabs,
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.blue, Colors.blue.shade800],
-            begin: Alignment.topLeft,
-            end: Alignment.topRight,
-            stops: const [0.0, 0.8],
-            tileMode: TileMode.clamp,
+          drawer: Drawer(
+            child: ListView(
+              children: [
+                DrawerHeader(
+                  padding: EdgeInsets.zero,
+                  margin: EdgeInsets.zero,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: const [
+                      Text('OpenEMT', style: AppTheme.title),
+                      FaIcon(FontAwesomeIcons.bus),
+                    ],
+                  ),
+                ),
+                ListTile(
+                  title: Text('Apariencia',
+                      style: Theme.of(context).textTheme.subtitle1),
+                ),
+                SwitchListTile(
+                  value: (state is ThemeDark),
+                  onChanged: (_) => context.read<ThemeCubit>().toggleTheme(),
+                  title: const Text('Modo oscuro'),
+                )
+              ],
+            ),
           ),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          items: const [
-            BottomNavigationBarItem(label: 'Inicio', icon: Icon(Icons.home)),
-            BottomNavigationBarItem(label: 'Mapa', icon: Icon(Icons.map)),
-          ],
-          onTap: (index) => setState(() {
-            _currentIndex = index;
-          }),
-        ),
-      ),
+          body: IndexedStack(
+            index: _currentIndex,
+            children: _tabs,
+          ),
+          bottomNavigationBar: Container(
+            decoration: (state is ThemeDark)
+                ? AppTheme.bottomBarDecorationDark
+                : AppTheme.bottomBarDecorationLight,
+            child: BottomNavigationBar(
+              currentIndex: _currentIndex,
+              items: const [
+                BottomNavigationBarItem(
+                    label: 'Inicio', icon: Icon(Icons.home)),
+                BottomNavigationBarItem(label: 'Mapa', icon: Icon(Icons.map)),
+              ],
+              onTap: (index) => setState(() {
+                _currentIndex = index;
+              }),
+            ),
+          ),
+        );
+      },
     );
   }
 }
