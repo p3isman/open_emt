@@ -26,6 +26,10 @@ class AppTheme {
       showSelectedLabels: false,
       showUnselectedLabels: false,
     ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      foregroundColor: Colors.white,
+      backgroundColor: Colors.black,
+    ),
     switchTheme: SwitchThemeData(
       thumbColor: MaterialStateProperty.all(Colors.white),
       trackColor: MaterialStateProperty.all(Colors.black87),
