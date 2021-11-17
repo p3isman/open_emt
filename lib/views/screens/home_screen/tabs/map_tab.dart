@@ -3,17 +3,18 @@ import 'package:custom_info_window/custom_info_window.dart';
 import 'package:fluster/fluster.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+
+import 'package:open_emt/main.dart';
 import 'package:open_emt/data/models/map_marker_model.dart';
 import 'package:open_emt/data/models/screen_arguments.dart';
 import 'package:open_emt/data/models/stop_list_model.dart';
 import 'package:open_emt/data/repositories/emt_repository.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:open_emt/main.dart';
+import 'package:open_emt/domain/cubit/theme_cubit/theme_cubit.dart';
 import 'package:open_emt/views/screens/detail_screen/detail_screen.dart';
 import 'package:open_emt/views/theme/theme.dart';
 
@@ -21,13 +22,10 @@ class MapTab extends StatefulWidget {
   const MapTab({Key? key}) : super(key: key);
 
   @override
-  State<MapTab> createState() => _MapTabState();
+  State<MapTab> createState() => MapTabState();
 }
 
-class _MapTabState extends State<MapTab> {
-  // Default controller
-  // final Completer<GoogleMapController> _controller = Completer();
-
+class MapTabState extends State<MapTab> {
   final CustomInfoWindowController _customInfoWindowController =
       CustomInfoWindowController();
 
@@ -83,6 +81,12 @@ class _MapTabState extends State<MapTab> {
                     onMapCreated: (GoogleMapController controller) {
                       _customInfoWindowController.googleMapController ??=
                           controller;
+                      context.read<ThemeCubit>().controller ??= controller;
+
+                      if (context.read<ThemeCubit>().state is ThemeDark) {
+                        context.read<ThemeCubit>().setMapTheme('dark');
+                      }
+
                       _updateMarkers(
                         fluster: fluster,
                         updatedZoom: _currentZoom,
@@ -279,7 +283,8 @@ class MarkerInfoWindow extends StatelessWidget {
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
                               i.name,
-                              style: AppTheme.waitingTimeSecondary,
+                              style: AppTheme.waitingTimeSecondary
+                                  .copyWith(color: Colors.black87),
                             ),
                           ),
                         ),
