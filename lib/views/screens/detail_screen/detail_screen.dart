@@ -4,6 +4,7 @@ import 'package:open_emt/data/models/screen_arguments.dart';
 import 'package:open_emt/data/repositories/emt_repository.dart';
 import 'package:open_emt/domain/bloc/favorite_stops_bloc/favorite_stops_bloc.dart';
 import 'package:open_emt/domain/bloc/stop_info_bloc/stop_info_bloc.dart';
+import 'package:open_emt/domain/cubit/theme_cubit/theme_cubit.dart';
 import 'package:open_emt/main.dart';
 import 'package:open_emt/views/theme/theme.dart';
 import 'package:open_emt/views/screens/detail_screen/widgets/arrive_info.dart';
@@ -32,16 +33,12 @@ class DetailScreen extends StatelessWidget {
           style: AppTheme.appBarTitle,
         ),
         centerTitle: true,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: <Color>[
-                  Colors.blue,
-                  Colors.blue.shade900,
-                ]),
-          ),
+        flexibleSpace: BlocBuilder<ThemeCubit, ThemeState>(
+          builder: (context, state) {
+            return (state is ThemeDark)
+                ? AppTheme.appBarDarkFlexibleSpace
+                : AppTheme.appBarLightFlexibleSpace;
+          },
         ),
       ),
       body: Column(
