@@ -51,10 +51,11 @@ class HomeTab extends StatelessWidget {
                     return 'Parada no válida.';
                   }
                 },
-                onFieldSubmitted: (text) {
+                onFieldSubmitted: (text) async {
                   if (_formFieldKey.currentState!.validate()) {
                     context.read<StopInfoBloc>().add(GetStopInfo(stopId: text));
-                    Navigator.pushNamed(context, DetailScreen.route,
+                    FocusScope.of(context).unfocus();
+                    await Navigator.pushNamed(context, DetailScreen.route,
                         arguments: ScreenArguments(stopId: text));
                   }
                 },
