@@ -20,6 +20,16 @@ class FavoriteAdded extends FavoriteStopsEvent {
   List<Object?> get props => [stop];
 }
 
+class FavoriteUpdated extends FavoriteStopsEvent {
+  const FavoriteUpdated(this.stop, this.values);
+
+  final StopInfo stop;
+  final Map<String, dynamic> values;
+
+  @override
+  List<Object?> get props => [stop, values];
+}
+
 class FavoriteDeleted extends FavoriteStopsEvent {
   const FavoriteDeleted(this.stop);
 

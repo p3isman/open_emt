@@ -13,6 +13,7 @@ class FavoriteStopsBloc extends Bloc<FavoriteStopsEvent, FavoriteStopsState> {
       : super(const FavoritesLoadInProgress()) {
     on<InitializeFavorites>(_onInitializeFavorites);
     on<FavoriteAdded>(_onFavoriteAdded);
+    on<FavoriteUpdated>(_onFavoriteUpdated);
     on<FavoriteDeleted>(_onFavoriteDeleted);
     on<FavoritesAllDeleted>(_onFavoritesAllDeleted);
   }
@@ -34,6 +35,20 @@ class FavoriteStopsBloc extends Bloc<FavoriteStopsEvent, FavoriteStopsState> {
     emit(FavoritesLoadSuccess(
       stops: stops,
     ));
+  }
+
+  void _onFavoriteUpdated(
+      FavoriteUpdated event, Emitter<FavoriteStopsState> emit) async {
+    // Update database
+    final StopInfo updatedStop =
+        event.stop.copyWith(direction: event.values['Direction']);
+    await favoritesRepository.updateFavorite(event.stop, updatedStop);
+    // Update state
+    final int index = (state as FavoritesLoadSuccess).stops.indexOf(event.stop);
+    final List<StopInfo> newStops = [...(state as FavoritesLoadSuccess).stops];
+    newStops.removeAt(index);
+    newStops.insert(index, updatedStop);
+    emit(FavoritesLoadSuccess(stops: newStops));
   }
 
   void _onFavoriteDeleted(
