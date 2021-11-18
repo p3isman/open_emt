@@ -141,6 +141,22 @@ class StopInfo {
     _data['Direction'] = direction;
     return _data;
   }
+
+  StopInfo copyWith({
+    String? label,
+    StopLines? stopLines,
+    String? description,
+    Geometry? geometry,
+    String? direction,
+  }) {
+    return StopInfo(
+      label: label ?? this.label,
+      stopLines: stopLines ?? this.stopLines,
+      description: description ?? this.description,
+      geometry: geometry ?? this.geometry,
+      direction: direction ?? this.direction,
+    );
+  }
 }
 
 class StopLines {
