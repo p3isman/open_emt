@@ -50,11 +50,11 @@ class FavoriteStop extends StatelessWidget {
       ),
       key: UniqueKey(),
       child: ListTile(
-        onTap: () {
+        onTap: () async {
           context
               .read<StopInfoBloc>()
               .add(GetStopInfo(stopId: state.stops[index].label));
-          Navigator.pushNamed(context, DetailScreen.route,
+          await Navigator.pushNamed(context, DetailScreen.route,
               arguments: ScreenArguments(stopId: state.stops[index].label));
         },
         leading: Card(
@@ -72,6 +72,27 @@ class FavoriteStop extends StatelessWidget {
             state.stops[index].direction,
             style: AppTheme.waitingTime.copyWith(fontSize: 14.0),
             softWrap: true,
+          ),
+        ),
+        trailing: IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () => showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Nombre de la parada:'),
+                content: TextField(
+                    autofocus: true,
+                    decoration: const InputDecoration(hintText: "Ej: Casa"),
+                    onSubmitted: (value) {
+                      context.read<FavoriteStopsBloc>().add(FavoriteUpdated(
+                            state.stops[index],
+                            {'Direction': value},
+                          ));
+                      Navigator.pop(context);
+                    }),
+              );
+            },
           ),
         ),
         subtitle: Wrap(
