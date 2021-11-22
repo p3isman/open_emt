@@ -35,9 +35,9 @@ class ThemeCubit extends Cubit<ThemeState> {
     if (theme == 'dark') {
       final String mapStyle =
           await rootBundle.loadString('assets/map_dark.json');
-      controller!.setMapStyle(mapStyle);
+      controller?.setMapStyle(mapStyle);
     } else {
-      controller!.setMapStyle('[]');
+      controller?.setMapStyle('[]');
     }
   }
 }
