@@ -1,8 +1,9 @@
+<p align="center"><img src="https://user-images.githubusercontent.com/33253306/143457812-6a4e803d-2205-437c-8abd-b9f4d5967b27.png" width=20%></p>
 <h1 align="center" border-bottom="none">OpenEMT</h1>
 <p align="center">A free and open source app to check Madrid EMT info.</p>
 <p align="center">
   <img src="https://img.shields.io/badge/platform-android%20%7C%20iOS-green">
-  <img src= "https://img.shields.io/github/license/p3isman/open_emt">
+  <img src="https://img.shields.io/github/license/p3isman/open_emt">
 </p>
 
 ## Features
